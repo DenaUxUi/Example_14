@@ -1,0 +1,89 @@
+---
+- name: Deploy Go Application with Docker
+  hosts: servers  # Используем группу серверов из инвентарного файла
+  become: yes  # Повышаем привилегии на сервере
+  tasks:
+
+    # Установка зависимостей для Ubuntu/Debian
+    - name: Обновляем apt и устанавливаем зависимости
+      apt:
+        update_cache: yes
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+
+    # Добавляем репозиторий Docker GPG ключ
+    - name: Добавляем репозиторий Docker GPG ключ
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    # Добавляем репозиторий Docker
+    - name: Добавляем репозиторий Docker
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+        state: present
+        update_cache: yes  # Обновляем кэш после добавления репозитория
+
+    # Устанавливаем Docker и Git
+    - name: Устанавливаем Docker и Git
+      apt:
+        name:
+          - docker-ce
+          - git
+        state: present
+
+    # Проверка установки Docker
+    - name: Проверяем установку Docker
+      command: docker --version
+      register: docker_version
+      changed_when: false
+      failed_when: docker_version.rc != 0
+
+    # Клонируем репозиторий с кодом
+    - name: Клонируем репозиторий с кодом
+      git:
+        repo: 'https://github.com/DenaUxUi/Example_8.git'  # Укажите URL вашего репозитория
+        dest: /home/ubuntu/myapp
+        clone: yes
+        update: yes
+
+    # Строим Docker образ
+    - name: Строим Docker образ
+      command:
+        cmd: docker build -t myapp /home/ubuntu/myapp
+        chdir: /home/ubuntu/myapp
+
+    # Создаём systemd сервис для контейнера
+    - name: Создаём systemd сервис для контейнера
+      copy:
+        content: |
+          [Unit]
+          Description=Go Application in Docker
+          After=docker.service
+
+          [Service]
+          Restart=always
+          ExecStart=/usr/bin/docker run --rm -p 8080:8080 myapp
+          ExecStop=/usr/bin/docker stop myapp
+
+          [Install]
+          WantedBy=multi-user.target
+        dest: /etc/systemd/system/myapp.service
+
+    # Перезагружаем systemd для применения нового сервиса
+    - name: Перезагружаем systemd для применения нового сервиса
+      systemd:
+        daemon_reload: yes
+
+    # Включаем и запускаем сервис
+    - name: Включаем и запускаем сервис
+      systemd:
+        name: myapp
+        state: started
+        enabled: yes
+
