@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>API Tester</title>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        max-width: 500px;
+        margin: 50px auto;
+        max-height: 100vh;
+        height: 90vh;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background-repeat: no-repeat;
+
+        background-size: cover;
+
+        background-image: url('./Желтая\ и\ белая\ абстрактная\ живопись\(1\).jpg');
+    }
+
+    .box {
+        background-color: #ffffff20;
+
+        width: 460px;
+        border-radius: 12px;
+        padding: 24px;
+
+        overflow: hidden;
+
+        color: white;
+        border: 1.5px solid #ffffff25;
+
+        box-shadow: 1px 2px 15px #00000035;
+    }
+
+    button {
+        max-width: 100%;
+        width: 100%;
+        margin: 10px 0;
+        padding: 8px;
+        font-size: 16px;
+        
+        border-radius: 12px;
+        border: 2px solid #ffffff;
+        background: #ffffff00;
+        color: white;
+        transition: 0.4s;
+    }
+
+    button:hover, button:focus{
+        transform: scale(1.009);
+    }
+
+    input,
+    textarea {
+        border-radius: 12px;
+        max-width: 100%;
+        width: 440px;
+        margin: 10px 0;
+        padding: 8px;
+        font-size: 16px;
+
+        border: 0px;
+    }
+
+    textarea {
+        height: 100px;
+        resize: none;
+    }
+
+</style>
+
+<body>
+    <div class="box">
+        <h1>API Hello Tester</h1>
+        <label>API Endpoint:</label>
+        <input type="text" id="endpoint" value="http://localhost:8080/api/hello"><br>
+        <label>Your Name:</label>
+        <input type="text" id="name"><br>
+        <button onclick="sendRequest()">Submit</button>
+        <h3>Server response:</h3>
+        <textarea id="response" cols="50" rows="5" readonly></textarea>
+    </div>
+    <script>
+        function sendRequest() {
+            const endpoint = document.getElementById('endpoint').value;
+            const name = document.getElementById('name').value;
+
+            if (!endpoint || !name) {
+                alert("Please provide both endpoint and name.");
+                return;
+            }
+
+            const url = `${endpoint}?name=${encodeURIComponent(name)}`;
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('Request failed: ' + response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('response').value = data['system-response'] || 'Invalid response';
+                })
+                .catch(err => {
+                    document.getElementById('response').value = err;
+                });
+        }
+    </script>
+</body>
+
+</html>
