@@ -12,11 +12,10 @@ type Response struct {
 
 func helloHandler(w http.ResponseWriter, r *http.Request) {
     // Разрешаем CORS
-    w.Header().Set("Access-Control-Allow-Origin", "*") // или конкретный домен вместо '*'
+    w.Header().Set("Access-Control-Allow-Origin", "*")
     w.Header().Set("Access-Control-Allow-Methods", "GET, OPTIONS")
     w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
-    // Предварительный запрос OPTIONS
     if r.Method == http.MethodOptions {
         w.WriteHeader(http.StatusOK)
         return
@@ -42,7 +41,12 @@ func helloHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+    // Отдача статики из папки static при запросе к /
+    http.Handle("/", http.FileServer(http.Dir("./static")))
+
+    // API обработчик
     http.HandleFunc("/api/hello", helloHandler)
+
     fmt.Println("Server started at http://localhost:8080")
     err := http.ListenAndServe(":8080", nil)
     if err != nil {
