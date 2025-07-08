@@ -1,0 +1,24 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars
+override.tf
+override.tf.json
+terraform.tfvars.json
+.terraform.lock.hcl
+
+# IDE / System
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log
+
+# SSH ключи (НИКОГДА не комить их)
+*.pem
+*.key
+
+.terraform/
+terraform-provider-aws_v6.0.0_x5

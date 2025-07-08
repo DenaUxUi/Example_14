@@ -1,0 +1,15 @@
+- name: Deploy Go backend + HTML frontend
+  hosts: ec2
+  become: true
+  tasks:
+    - name: Pull Docker image from Docker Hub
+      shell: docker pull yourdevopsdena/helloapp:latest
+
+    - name: Stop and remove existing container (if any)
+      shell: |
+        docker stop helloapp || true
+        docker rm helloapp || true
+
+    - name: Run Docker container
+      shell: docker run -d --name helloapp -p 80:8080 yourdevopsdena/helloapp:latest
+

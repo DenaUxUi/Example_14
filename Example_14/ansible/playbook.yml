@@ -1,0 +1,29 @@
+# Back-end application ansible-playbook
+---
+- name: "Back-end application"
+  hosts: ec2
+  become: true
+  tasks:
+    - name: "Update apt cache"
+      apt:
+        update_cache: yes
+
+    - name: "Install Docker and pip"
+      apt:
+        name:
+          - docker.io
+          - python3-pip
+        state: present
+
+    - name: "Ensure Docker is running and enabled"
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: "Add ubuntu user to docker group"
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
