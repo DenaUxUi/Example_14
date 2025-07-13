@@ -1,10 +1,24 @@
 package main
 
 import (
+    "context"
     "encoding/json"
+    
     "fmt"
+    "log"
     "net/http"
+    "os"
+
+    	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
 )
+
+var (
+    ec2Client      *ec2.Client
+    lastInstanceId string
+)
+
 
 type Response struct {
     Message string `json:"system-response"`
