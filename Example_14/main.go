@@ -67,6 +67,7 @@ func handleCreateInstance(w http.ResponseWriter, r *http.Request) {
 
     result, err := ec2Client.RunInstances(context.TODO(), input)
     if err != nil || len(result.Instances) == 0 {
+	log.Printf("RunInstances failed: %v\n", err)
         http.Error(w, "Instance creation error: "+err.Error(), http.StatusInternalServerError)
         return
     }
